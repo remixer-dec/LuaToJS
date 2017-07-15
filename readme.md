@@ -1,6 +1,6 @@
-**LuaToJS - Translate lua syntax to js** 
-[remixer-dec.github.io/LuaToJS/](https://remixer-dec.github.io/LuaToJS/)
-Experimental project created to simplify translation of Lua code to JS.
+**LuaToJS - Translate lua syntax to js**   
+[remixer-dec.github.io/LuaToJS/](https://remixer-dec.github.io/LuaToJS/)  
+Experimental project created to simplify translation of Lua code to JS.  
 > What's the difference between this project and some similar like [lua2js](https://github.com/mherkender/lua.js)?
 
 This one works without NodeJS, (in browser) and not uses abstraction (like usage of functions to get the value of a table). You get similar to the original code but with some limitations. 
