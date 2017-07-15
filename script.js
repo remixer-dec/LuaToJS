@@ -2,7 +2,7 @@ window.onload = function(){
       luac = CodeMirror.fromTextArea(lua,{mode:'lua',theme:'default',lineNumbers: true,styleActiveLine: true,matchBrackets: true});
       jsc = CodeMirror.fromTextArea(js,{mode:'javascript',theme:'default',lineNumbers: true,styleActiveLine: true,matchBrackets: true});
 }
-function translate(){
+function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxForever(){
 	var l = luac.getValue();
 	af = arrfix.value;
 	l = l.replace(/:/img,'.');
