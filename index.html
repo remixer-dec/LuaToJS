@@ -8,13 +8,39 @@
 	<link rel="stylesheet" href="https://cdn.rawgit.com/skidding/obvious-buttons/master/src/obvious-buttons.css">
       <title>LuaToJS</title>
       <style>
-       	h3,h4{
+            @import url('https://fonts.googleapis.com/css?family=Bubblegum+Sans');
+           	h3,h4{
        		text-align: center;
        	}
+            body{
+                  font-family: sans-serif;
+                  background: #eee;
+                  margin: 60px 0;
+            }
+            h3 {
+                  background: #00007F;
+                  color: #fff;
+                  height: 50px;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  z-index: 100;
+                  border-radius: 0 0 20px 20px;
+                  box-shadow: 0 1px 8px rgba(0,0,0,.30);
+                  font-family: 'Bubblegum Sans', cursive;
+                  font-size: 28px;
+                  width: 100%;
+                  margin: 0;
+                  padding: 8px;
+                  box-sizing: border-box;
+            }
+            @media only screen and (max-width: 330px) {
+                  h3{font-size: 16px;height:36px;}
+            }
       </style>
    </head>
    <body>
-   	<h3>Lua to js syntax translator</h3>
+   	<h3><span>Lua to js syntax translator</span></h3>
    	<h4>lua code</h4>
       <textarea id ="lua"></textarea>
       <h4>js code</h4>
