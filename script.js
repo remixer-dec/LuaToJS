@@ -33,6 +33,8 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 	l = l.replace(/(\n|\s)end( |,)?/img,'$1}$2');
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/nil/img,nilfix.value);
+	l = oneLineVars(l,l.match(/(([a-z0-9_]+)\s?,\s?)+([a-z0-9_]+)\s?=\s?(.+,)+(.+)$/img));
+
 	if(af == 2){
 		l = l.replace(/for\(([a-z0-9_]+)=1;/img,'for($1=0;');
 	}
@@ -45,14 +47,38 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 }
 
 /**
+ * { deals with multiple variables assigned in one line }
+ *
+ * @param      {string}  l       { full lua code }
+ * @param      {string}  mtch    { matching lines of code }
+ * @note this function will crash if there is a table or a string with comas inside multi-var assignment
+ */
+function oneLineVars(l,mtch){
+	for(var i = 0; mtch[i] != "" && mtch[i] != undefined && mtch != null; i++){
+		var s = mtch[i].split("=");
+		var vars = s[0].split(',');
+		var vals = s[1].split(',');
+		var result = 'var';
+		var j = 0;
+		for(var v of vars){
+			result+=` ${v} = ${vals[j]},`;
+			j++;
+		}
+		result = result.substr(0,result.length-1);
+		l = l.replace(mtch[i],result);
+	}
+	return l;
+}
+
+/**
  * { converts tables to objects and arrays }
  *
  * @param      {string}  t       { lua code }
  */
 function objectConvertor(t){ 
 	try{
-	var flvl = 0,phr = '', olvl=[0,0,0,0,0,0,0,0,0,0,0,0,0,0],oinfo = [[]],line=0,isstr=!!0;; 
-	for(l of t){
+	var flvl = 0,phr = '', olvl=[0,0,0,0,0,0,0,0,0,0,0,0,0,0],oinfo = [[]],line=0,isstr=!!0;
+	for(var l of t){
 		phr+=l;
 		switch(l){
 			case "'"://this solution is not very good, something like "'" will crash it

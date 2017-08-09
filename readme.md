@@ -22,7 +22,6 @@ This one works without NodeJS, (in browser) and not uses abstraction (like usage
 * [ ] inheritance  
 * [ ] __index  
 * [ ] dofile/require/loadstring/loadfile  
-* [ ] multiple variable assignment  
+* [x] ~~ multiple variable assignment ~~  
 ** **
 *[created by Remixer Dec](https://github.com/remixer-dec) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode)*
-
