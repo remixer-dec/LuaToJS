@@ -2,7 +2,7 @@ window.onload = function(){
       luac = CodeMirror.fromTextArea(lua,{mode:'lua',theme:'default',lineNumbers: true,styleActiveLine: true,matchBrackets: true});
       jsc = CodeMirror.fromTextArea(js,{mode:'javascript',theme:'default',lineNumbers: true,styleActiveLine: true,matchBrackets: true});
 }
-function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxForever(){
+function tr(){
 	var l = luac.getValue();
 	af = arrfix.value;
 	l = l.replace(/:/img,'.');
@@ -34,9 +34,12 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/nil/img,nilfix.value);
 	l = oneLineVars(l,l.match(/(([a-z0-9_]+)\s?,\s?)+([a-z0-9_]+)\s?=\s?(.+)$/img));
-
+	
 	if(af == 2){
 		l = l.replace(/for\(([a-z0-9_]+)=1;/img,'for($1=0;');
+	}
+	if(luafilesfix.value == 1){
+		l = l.replace(/\.lua/img,'.js');
 	}
 	if(vrfix.value == 1){
 		l = l.replace(/local (?!function)/img,'var ');
