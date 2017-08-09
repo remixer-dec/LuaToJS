@@ -21,7 +21,7 @@ function tr(){
 	l = l.replace(/until ([^\n]+)/img,'while ($1);');
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/gim,'for(var $1; $2<$4; $2++){')
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+) ?, ?(-?[0-9])+\s*\n?do?/img,'for(var $1; $2'+(parseInt('$5')>0?'<':'>')+'$4; $2+=$5){')
-	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?\#([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/img,'for(var $1; $2<$4.length; $2++){')
+	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?\# ?([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/img,'for(var $1; $2<$4.length; $2++){')
 	l = l.replace(/for ([a-z0-9_]+) ?, ?([a-z0-9_]+) in i?pairs\(([a-z0-9_\[\]\(\).+\-*]+)\)\s*\n?do/img,'for(var $1 in $3){var $2=$3[$1];')
 	l = l.replace(/ or /img,' || ');
 	l = l.replace(/ and /img,' && ');
@@ -32,6 +32,7 @@ function tr(){
 	l = l.replace(/(function[^\)]+\))/img,'$1{');
 	l = l.replace(/(\n|\s)end/img,'$1}');
 	l = l.replace(/math\./img,'Math.');
+	l = l.replace(/\#([a-z0-9_\[\]\(\).+*\/\-]+)/img,'$1.length');
 	l = l.replace(/nil/img,nilfix.value);
 	l = oneLineVars(l,l.match(/(([a-z0-9_]+)\s?,\s?)+([a-z0-9_]+)\s?=\s?(.+)$/img));
 	
