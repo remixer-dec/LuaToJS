@@ -54,7 +54,7 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
  * @note this function will crash if there is a table or a string with comas inside multi-var assignment
  */
 function oneLineVars(l,mtch){
-	for(var i = 0; mtch[i] != "" && mtch[i] != undefined && mtch != null; i++){
+	for(var i = 0; mtch != null && mtch[i] != "" && mtch[i] != undefined; i++){
 		var s = mtch[i].split("=");
 		var vars = s[0].split(',');
 		var vals = s[1].split(',');
