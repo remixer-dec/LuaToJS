@@ -12,16 +12,16 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 	//l = l.replace(/\{([^=\n]+)\}/img,'[$1]'); //old array convertor
 	l = objectConvertor(l)
 	l = l.replace(/--/img,'//');
-	l = l.replace(/if ?([^\(].+) then/img,'if($1){');
+	l = l.replace(/if ?([^\(].+?) then/img,'if($1){');
 	l = l.replace(/else(\s)(?!if)/img,'}else{$1');
 	l = l.replace(/else\s?if/img,'}else if');
 	l = l.replace(/then/img,'{');
-	l = l.replace(/while ?([^\(].+) do/img,'while($1){');
+	l = l.replace(/while ?([^\(].+?) do/img,'while($1){');
 	l = l.replace(/repeat/img,'do');
 	l = l.replace(/until ([^\n]+)/img,'while ($1);');
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/gim,'for(var $1; $2<$4; $2++){')
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+) ?, ?(-?[0-9])+\s*\n?do?/img,'for(var $1; $2'+(parseInt('$5')>0?'<':'>')+'$4; $2+=$5){')
-	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?\#([0-9a-z_\[\]]+)\s*\n?do/img,'for(var $1; $2<$4.length; $2++){')
+	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?\#([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/img,'for(var $1; $2<$4.length; $2++){')
 	l = l.replace(/for ([a-z0-9_]+) ?, ?([a-z0-9_]+) in i?pairs\(([a-z0-9_\[\]\(\).+\-*]+)\)\s*\n?do/img,'for(var $1 in $3){var $2=$3[$1];')
 	l = l.replace(/ or /img,' || ');
 	l = l.replace(/ and /img,' && ');
@@ -30,10 +30,10 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 	l = l.replace(/([^\.])\.\.([^\.])/img,'$1+$2');
 	l = l.replace(/\.\.\./img,'...arg');
 	l = l.replace(/(function[^\)]+\))/img,'$1{');
-	l = l.replace(/(\n|\s)end( |,)?/img,'$1}$2');
+	l = l.replace(/(\n|\s)end/img,'$1}');
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/nil/img,nilfix.value);
-	l = oneLineVars(l,l.match(/(([a-z0-9_]+)\s?,\s?)+([a-z0-9_]+)\s?=\s?(.+,)+(.+)$/img));
+	l = oneLineVars(l,l.match(/(([a-z0-9_]+)\s?,\s?)+([a-z0-9_]+)\s?=\s?(.+)$/img));
 
 	if(af == 2){
 		l = l.replace(/for\(([a-z0-9_]+)=1;/img,'for($1=0;');
@@ -135,6 +135,6 @@ function objectConvertor(t){
 		}
 	}
 	} catch(e){alert('Error: '+e+' on line '+line);console.log(flvl);console.log(olvl);console.log(oinfo)}
-	return phr
+	return phr;
 }
       
