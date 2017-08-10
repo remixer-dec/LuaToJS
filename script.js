@@ -47,7 +47,9 @@ function tr(){
 	}
 	if(vrfix.value == 1){
 		l = l.replace(/local (?!function)/img,'var ');
-	} else{
+	} else if(vrfix.value == 2){
+		l = l.replace(/local (?!function)/img,'let ');
+	} else {
 		l = l.replace(/local /img,'');
 	}
 	jsc.setValue(l);
@@ -58,7 +60,7 @@ function tr(){
  *
  * @param      {string}  l       { full lua code }
  * @param      {string}  mtch    { matching lines of code }
- * @note this function will crash if there is a table or a string with comas inside multi-var assignment
+ * @note this function will crash if there is a table or a string with commas inside multi-var assignment
  */
 function oneLineVars(l,mtch){
 	for(var i = 0; mtch != null && mtch[i] != "" && mtch[i] != undefined; i++){

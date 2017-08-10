@@ -10,7 +10,7 @@ This one works without NodeJS, (in browser) and not uses abstraction (like usage
  - Every reserved keyword will be replaced even if it's inside a string or is a function name. 
 
 > What is unimplemented yet or not working?
-
+* [ ] metatables
 * [ ] native functions  
 * [ ] constants  
 * [ ] 1 line functions  
