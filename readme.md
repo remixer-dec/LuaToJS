@@ -17,7 +17,7 @@ This one works without NodeJS, (in browser) and not uses abstraction (like usage
 * [ ] multiple returns  
 * [ ] prints with and without brackets  
 * [ ] tables with unusual indexes  
-* [ ] functions inside tables, created after a tables (like function a.b() )  
+* [x] <del>functions inside tables, created after a tables (like function a.b()</del> )  
 * [ ] array / object concatenation  
 * [ ] inheritance  
 * [ ] __index  

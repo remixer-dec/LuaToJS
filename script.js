@@ -22,14 +22,17 @@ function tr(){
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/gim,'for(var $1; $2<$4; $2++){')
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?([0-9a-z_\[\]\(\).+\-*]+) ?, ?(-?[0-9])+\s*\n?do?/img,'for(var $1; $2'+(parseInt('$5')>0?'<':'>')+'$4; $2+=$5){')
 	l = l.replace(/for (([a-z0-9_]+) ?= ?-?([0-9a-z_\[\]\(\).+\-*]+)) ?, ?\# ?([0-9a-z_\[\]\(\).+\-*]+)\s*\n?do/img,'for(var $1; $2<$4.length; $2++){')
-	l = l.replace(/for ([a-z0-9_]+) ?, ?([a-z0-9_]+) in i?pairs\(([a-z0-9_\[\]\(\).+\-*]+)\)\s*\n?do/img,'for(var $1 in $3){var $2=$3[$1];')
+	l = l.replace(/for ([a-z0-9_]+) ?, ?([a-z0-9_]+) in.+?i?pairs\(([a-z0-9_\[\]\(\).+\-*]+)\)\s*\n?do/img,'for(var $1 in $3){var $2=$3[$1];')
 	l = l.replace(/ or /img,' || ');
 	l = l.replace(/ and /img,' && ');
 	l = l.replace(/(\s)?not /img,'$1!');
+	l = l.replace(/self/img,'this');
+	l = l.replace(/local function/img,'function');// ¯\_(ツ)_/¯
 	l = l.replace(/~=/img,'!=');
 	l = l.replace(/([^\.])\.\.([^\.])/img,'$1+$2');
 	l = l.replace(/\.\.\./img,'...arg');
 	l = l.replace(/(function[^\)]+\))/img,'$1{');
+	l = l.replace(/function ([a-z_\[\]]+\.[a-z_\[\].]+)/img,'$1 = function');
 	l = l.replace(/(\n|\s)end/img,'$1}');
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/\#([a-z0-9_\[\]\(\).+*\/\-]+)/img,'$1.length');
@@ -62,7 +65,7 @@ function oneLineVars(l,mtch){
 		var s = mtch[i].split("=");
 		var vars = s[0].split(',');
 		var vals = s[1].split(',');
-		var result = 'var';
+		var result = '';
 		var j = 0;
 		for(var v of vars){
 			result+=` ${v} = ${vals[j]},`;
