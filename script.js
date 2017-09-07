@@ -26,11 +26,13 @@ function translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxFor
 	l = l.replace(/ or /img,' || ');
 	l = l.replace(/ and /img,' && ');
 	l = l.replace(/(\s)?not /img,'$1!');
+	l = l.replace(/\^/img,'**');
 	l = l.replace(/~=/img,'!=');
 	l = l.replace(/([^\.])\.\.([^\.])/img,'$1+$2');
 	l = l.replace(/\.\.\./img,'...arg');
 	l = l.replace(/(function[^\)]+\))/img,'$1{');
 	l = l.replace(/(\n|\s)end( |,)?/img,'$1}$2');
+	l = l.replace(/math\.pi/img,'Math.PI');
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/nil/img,nilfix.value);
 	if(af == 2){

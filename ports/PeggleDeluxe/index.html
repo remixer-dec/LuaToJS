@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#858585">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<title>PeggleDeluxe | LuaToJS Port</title>
+</head>
+<body>
+<style>
+	html, body {
+	  width:  100%;
+	  height: 100%;
+	  margin: 0px;
+	  font-family: 'Arial', sans-serif;
+	  background: #444;
+	}
+	#cvwrapper{
+		width: 480px;
+		height: 280px;
+		display: block;
+		top:0;
+		bottom:0;
+		left:0;
+		right:0;
+		position: fixed;
+		margin: auto;
+	}
+	table *{
+		user-select:none;
+		-webkit-user-select:none;
+		-moz-user-select:none;
+	}
+	#xcontrols button {
+		background: #444;
+		border: 2px solid #444;
+		border-radius: 2px;
+		color: white;
+		padding: 2px 10px;
+	}
+	#xcontrols,#chelp {
+		display: none;
+		position: fixed;
+		left: 0;
+		right: 0;
+		width: 230px;
+		bottom: 20px;
+		z-index: 22;
+		height: 130px;
+		margin: auto;
+		background: rgba(0,0,0,.52);
+		transform:scale(1.5);
+	}
+	#chelp{
+		display: block;
+		bottom: 0;
+		text-align: center;
+		color:#777;
+		width: 100%;
+		height: 22px;
+	}
+	#ori{
+		display: none;
+	}
+	@media (orientation: portrait){
+		#ori{
+			display: block;
+			position: fixed;
+			top:0;
+			left:0;
+			width: 100%;
+			height:100%;
+			overflow: hidden;
+			color:white;
+			background: #594;
+			font-size: 20px;
+			text-align: center;
+			padding: 240px 0;
+			z-index: 29;
+		}
+	}
+
+	@media only screen and (max-width: 450px) {
+		#xcontrols{
+			display: block;
+		}
+		#chelp{
+			display: none;
+		}
+	}
+</style>
+<div id="chelp">Controls: AD/arrows; to move, Space/Enter to shoot. Q/E = L/R, H = /\</div>
+<div id="ori">Please change your device's orientation</div>
+<div id="cvwrapper">
+	<canvas width="480" height="272" id="cvs" style="border:2px solid black"></canvas>
+	<button onclick="zoomIn()">+</button><button onclick="zoomOut()">-</button>
+	<button onclick="fps=1">25FPS</button><button onclick="fps=false">60FPS</button>
+	<button onclick="xcontrols.style.display='block'">TOUCH CONTROLS</button><button onclick="trace.length=500">CHEAT</button><button onclick="document.body.style = 'background:url(http://i33.tinypic.com/2qmzuhd.png) 50%50% no-repeat;background-size:860px;'">CHANGE SKIN</button>
+</div>
+<div id='xcontrols'>
+		<table>
+			<tr>
+				<td><button onclick="CTRLS.l?eventUnpressed('l'):eventPressed('l')"> L </button></td>
+				<td></td><td></td><td></td><td></td><td></td><td><button onclick="CTRLS.r?eventUnpressed('r'):eventPressed('r')"> R </button></td>
+			</tr>
+			<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+			<tr>
+				<td></td>
+				<td><button ontouchstart="eventPressed('up')" ontouchend="eventUnpressed('up')"> ^ </button></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('triangle')" ontouchend="eventUnpressed('triangle')"> /\ </button></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><button ontouchstart="eventPressed('left')" ontouchend="eventUnpressed('left')"> &lt; </button></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('right')" ontouchend="eventUnpressed('right')"> > </button></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('square')" ontouchend="eventUnpressed('square')">[]</button></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('circle')" ontouchend="eventUnpressed('circle')"> O </button></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button ontouchstart="eventPressed('down')" ontouchend="eventUnpressed('down')"> V </button></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('cross')" ontouchend="eventUnpressed('cross')"> X </button></td>
+				<td></td>
+			</tr>
+		</table>
+	</div>
+<script>
+
+/* LUA PLAYER PARTIAL IMPLEMENTATION  */
+var ctx = cvs.getContext('2d');
+ctx.canvas.width=480;
+ctx.canvas.height=272;
+
+var fps = false;
+var table = {};
+table.insert = 
+	(a,n) => {
+		a.push(n);
+	}
+Math.rng = Math.random;
+Math.random = function (min, max) {
+  return Math.floor(Math.rng() * (max - min + 1) + min);
+}
+var Color = {};
+Color.new = function(r,g,b){
+	return "#"+((256+r<<8|g)<<8|b).toString(16).slice(1);
+}
+var screen = {
+	clear: ()=>{
+	      ctx.fillStyle = "#000";
+	      ctx.fillRect(0, 0, 480, 272);
+	},
+	flip: ()=>{},
+	blit: (x, y, img, sx, sy, w, h, a)=>{
+		a = a < 0 ? 0 : a;
+		ctx.save();
+	    ctx.globalAlpha = Math.floor(a/255*10)/10
+	    if(sx||sy||w||h){
+	    	ctx.drawImage(img, sx, sy,w,h,x,y,w,h);
+	    }else {
+	    	ctx.drawImage(img, x, y);
+	    }
+	    ctx.restore()
+	},
+	fontPrint: (size,x,y,txt,color)=>{
+		ctx.font=size+" Arial";
+		ctx.fillStyle = color;
+		ctx.fillText(txt,x,y);
+	},
+	fillRect: (x, y, w,h,color)=>{
+		ctx.fillStyle=color||"black";
+		ctx.fillRect(x,y,w,h);
+	},
+	drawLine: (x0,y0,x1,y1,color)=>{
+		ctx.beginPath();
+		ctx.moveTo(x0,y0);
+		ctx.lineTo(x1,y1);
+		ctx.strokeStyle = color||"black";
+		ctx.stroke();
+	}
+}
+
+Image.load = (p)=>{
+	var img = new Image();
+    img.src = 'data:image/png;base64,'+data[p.split('/')[1]];
+    return img;
+}
+
+var Sound = {};
+Sound.load = s=>{
+	s = 'data:audio/wav;base64,'+data[s.split('/')[1]];
+	return {play:()=>{
+		new Audio(s).play()
+		return {frequency:x=>0}}}}
+
+var Font = {}
+Font.createMonoSpaced = ()=>{
+	return {s:"12px",setPixelSizes:(x,d)=>{this.s=d+"px"}}
+}
+var CTRLS = {
+	buttons:0,
+	start:!!0,
+	select:!!0,
+	l:!!0,
+	r:!!0,
+	cross:!!0,
+	triangle:!!0,
+	square:!!0,
+	circle:!!0,
+	up:!!0,
+	down:!!0,
+	left:!!0,
+	right:!!0
+};
+var Controls = {
+	read:()=>{
+		return {
+			buttons:()=>CTRLS.buttons,
+			l:()=>CTRLS.l,
+			r:()=>CTRLS.r,
+			cross:()=>CTRLS.cross,
+			triangle:()=>CTRLS.triangle,
+			square:()=>CTRLS.square,
+			circle:()=>CTRLS.circle,
+			up:()=>CTRLS.up,
+			down:()=>CTRLS.down,
+			left:()=>CTRLS.left,
+			right:()=>CTRLS.right,
+			start:()=>CTRLS.start,
+			select:()=>CTRLS.select,
+			all:()=>JSON.stringify(CTRLS)
+		}
+	}
+}
+function eventPressed(n){
+	CTRLS[n] = !!1;
+	CTRLS['buttons']=!!1;
+}
+function eventUnpressed(n){
+	CTRLS[n] = !!0;
+	CTRLS['buttons']=!!0;
+}
+window.addEventListener('keydown',(e)=>{
+	switch(e.keyCode){
+		case 65:
+		case 37:
+			eventPressed('left')
+		break;
+		case 68:
+		case 39:
+			eventPressed('right')
+		break
+		case 32:
+		case 13:
+			eventPressed('cross')
+		break;
+		case 81:
+			eventPressed('l')
+		break;
+		case 69:
+			eventPressed('r')
+		break;
+		case 72:
+			eventPressed('triangle')
+		break;
+	}
+});
+window.addEventListener('keyup',(e)=>{
+	switch(e.keyCode){
+		case 65:
+		case 37:
+			eventUnpressed('left')
+		break;
+		case 68:
+		case 39:
+			eventUnpressed('right')
+		break
+		case 32:
+		case 13:
+			eventUnpressed('cross')
+		break;
+		case 81:
+			eventUnpressed('l')
+		break;
+		case 69:
+			eventUnpressed('r')
+		break;
+		case 72:
+			eventUnpressed('triangle')
+		break;
+	}
+});
+var zz = 1;
+function zoomIn(){
+	zz+=0.5;
+	cvwrapper.style.transform='scale('+zz+')';
+}
+function zoomOut(){
+	zz-=0.5;
+	cvwrapper.style.transform='scale('+zz+')';
+}
+/* END OF LUAPLAYER PARTIAL IMPLEMENTATION */
+
+
+
+// CODE BELLOW WAS GENERATED BY LuaToJS script. Some parts were manually edited to fix compatibility.
+// ALL COMMENTS BELLOW ARE WRITTEN BY ORIGINAL GAME DEVELOPERS
+
+
+// FUNCTIONS
+
+// Simple delay function, where timer is overkill
+function delay(){}
+
+function createBumper(bumper_type,x,y){
+
+	// types.
+	//// 0 (red 100 pts)
+	//// 1 (blue 10 pts)
+	//// 2 (green targeting scope)
+	//// 3 (yellow score bonus)
+	//// "fixed"
+	//// "active"
+	
+	// bumper[undefined,type,radius,x,y,hit]
+	
+	bumper = {}
+	bumper.type = bumper_type
+	
+	if(bumper_type == "fixed" || bumper_type == "active"){
+		bumper.radius = 16
+	}else{
+		bumper.radius = 8
+	}
+	
+	bumper.x = x || Math.random(bumper.radius+board.minx+mingap,board.maxx-bumper.radius-mingap) 
+	bumper.y = y || Math.random(bumper.radius+board.minby,board.maxby-bumper.radius)
+	
+	bumper.hit=0
+
+	return bumper;
+}
+
+
+function addRandomBumpers(bumper_type, count){
+	for(var i=1; i<count; i++){
+		new_bumper = createBumper(bumper_type)
+		
+		// add check for position validity here
+		valid = false;
+		while(!valid){
+		
+			valid = true;
+			for(var b=1; b<bumpers.length; b++){
+				// check distance to all existing bumpers
+				distance = new_bumper.radius + bumpers[b].radius + 13;
+				actual_dist = Math.sqrt( (new_bumper.x - bumpers[b].x)**2 + (new_bumper.y - bumpers[b].y)**2 );
+				if(actual_dist < distance){
+					valid = false;
+					new_bumper = createBumper(bumper_type);
+					break;
+				}
+			}
+		
+		}
+		
+		table.insert(bumpers,new_bumper)
+	}
+}
+
+
+function setBall(x,y, vx,vy, time){
+
+	// ball[undefined,radius,orig_x,orig_y,orig_vx,orig_vy,x,y,vx,vy,visible]
+	
+	// x,y   - current position
+	// vx,vy - current velocity
+	// time  - time at point of origin
+	// orig  - position && velocity at point of origin
+	
+	if(typeof ball == 'undefined'){
+		ball = {}
+		ball.radius = 6
+		ball.x = 0
+		ball.y = 0
+		ball.vx = 0
+		ball.vy = 0
+		ball.time = 0
+	}
+	
+	ball.x = x || ball.x
+	ball.y = y || ball.y
+	
+	ball.vx = vx || ball.vx
+	ball.vy = vy || ball.vy
+	
+	ball.orig_vx = vx
+	ball.orig_vy = vy
+	
+	ball.orig_x = x
+	ball.orig_y = y
+	
+	ball.time = time || ball.time
+	
+	ball.visible = true
+	
+	return ball;
+}
+
+function resetBall(time){
+	setBall(ball.x,ball.y,ball.vx*friction,ball.vy*friction,time)
+}
+
+
+function checkBumperCollision(bumper,real){
+
+	// real. if true, process gameplay events
+	// otherwise, just calculate vectors (for targeting trace)
+	if(typeof real == 'undefined' ){ real = true }
+	
+	// do simple bounding box check first for efficiency
+	if((ball.x-ball.radius > bumper.x-bumper.radius && ball.x-ball.radius < bumper.x+bumper.radius &&
+	    ball.y-ball.radius > bumper.y-bumper.radius && ball.y-ball.radius < bumper.y+bumper.radius) ||
+	   (ball.x+ball.radius > bumper.x-bumper.radius && ball.x+ball.radius < bumper.x+bumper.radius &&
+	    ball.y-ball.radius > bumper.y-bumper.radius && ball.y-ball.radius < bumper.y+bumper.radius) ||
+	   (ball.x-ball.radius > bumper.x-bumper.radius && ball.x-ball.radius < bumper.x+bumper.radius &&
+	    ball.y+ball.radius > bumper.y-bumper.radius && ball.y+ball.radius < bumper.y+bumper.radius) ||
+	   (ball.x+ball.radius > bumper.x-bumper.radius && ball.x+ball.radius < bumper.x+bumper.radius &&
+	    ball.y+ball.radius > bumper.y-bumper.radius && ball.y+ball.radius < bumper.y+bumper.radius)) {
+	
+		// bounding box collides; check for circular collision
+
+		// distance below which collision occurs
+		distance = ball.radius + bumper.radius
+		
+		actual_dist = Math.sqrt( (bumper.x - ball.x)**2 + (bumper.y - ball.y)**2 )
+		
+		if(actual_dist < distance){
+			// get ball velocity
+			bv = Math.sqrt(ball.vx**2 + ball.vy**2)
+			// get angle of incidence
+			bi = Math.atan2(ball.vy, ball.vx)
+			// get angle of normal
+			normal = Math.atan2(bumper.y - ball.y, bumper.x - ball.x)
+			nx = Math.cos(normal)
+			ny = Math.sin(normal)
+			// get angle of reflection
+			br = bi + Math.PI - ((bi-normal)*2)
+			
+			//set ball position to be !less than collision distance
+			ball.x = bumper.x - (distance*nx)
+			ball.y = bumper.y - (distance*ny)
+			
+			// set new ball velocity
+			ball.vx = Math.cos(br)*bv
+			ball.vy = Math.sin(br)*bv
+			
+			if(real && bumper.type != "active" && bumper.type != "fixed" && bumper.hit==0){
+				snd_bumperlit.play().frequency(22000+(hitcount*1000))
+				hitcount = hitcount + 1
+				bumper.hit = 1 // lights up bumper, ready for later removal
+
+				if(bumper.type == 0){
+					bumperscore = redscore*scoremultiplier
+				}else{
+					bumperscore = normalscore*scoremultiplier
+				}
+					
+				if(bonus){
+					bumperscore = bumperscore*bonusmultiplier
+				}
+				
+				if(!freeball){
+					ballscore = ballscore + bumperscore
+					if(ballscore > freeballat){
+						ballcount = ballcount + 1
+						snd_extraball.play()
+						freeball = true
+					}
+				}
+				
+				score = score + bumperscore
+				
+ 
+				if(bumper.type == 2){
+					guidecount = guidecount + 3
+				}else if(bumper.type == 3){
+					bonus = true
+				}
+				
+				
+			}else if(bumper.type == "active"){
+				if(real){
+					snd_activehit.play()
+					bumper.hit = 5 // lights up active bumper, sets light countdown
+				}
+				
+				// add active bumper boost (along normal) to ball velocity 
+				ball.vx = ball.vx - (activeboost * nx)
+				ball.vy = ball.vy - (activeboost * ny)
+			}else if(real){
+				if(bumper.type == "fixed"){
+					snd_fixedhit.play()
+				}else{
+					snd_bumpertouch.play()
+				}
+			}
+			
+			return true
+	
+		}
+	
+	}
+	
+	return false
+}
+
+function processBall(time,real){
+		if(typeof real == 'undefined'){ real = true }
+		if(time == 1){ball.time=0;}
+		timediff = time - ball.time
+
+		// set ball's position at this time
+		ball.x = ball.orig_x + ball.orig_vx*timediff
+		ball.y = ball.orig_y + (ball.orig_vy*timediff)+(gravity*timediff*timediff/2)
+		// set ball's velocity at this time
+		ball.vx = ball.orig_vx
+		ball.vy = ball.orig_vy+(timediff*gravity)
+
+		// check for wall collisions
+		if(ball.y < (board.miny+ball.radius) && ball.vy < 0){
+			if(real){ snd_bumpertouch.play() }
+			ball.vy = -ball.vy
+			return true
+		}
+		if( (ball.x > board.maxx-ball.radius && ball.vx > 0) || (ball.x < board.minx+ball.radius && ball.vx < 0)){
+			if(real){ snd_bumpertouch.play() }
+			ball.vx = -ball.vx
+			return true
+		}
+		
+		// check for bumper collisions
+		for(var i=1; i<bumpers.length; i++){
+			if(checkBumperCollision(bumpers[i],real)){
+				return true
+			}
+		}
+
+}
+
+
+
+// INITIALISATION
+
+//Math.randomseed(os.time())
+fetch('data.json').then(d=>d.json()).then(j=>{
+window.data = j
+
+black = Color.new(0,0,0)
+green = Color.new(0,255,0)
+yellow = Color.new(255,255,0);
+white = Color.new(255,255,255);
+darkgreen = Color.new(0,64,0);
+darkblue = Color.new(0,0,64);
+img_splash1 = Image.load("data/neoflash.png")
+img_splash2 = Image.load("data/splash.png")
+l2j = Image.load("data/lua2js.png")
+setTimeout(()=>{
+	screen.blit(0,0,img_splash1)
+	screen.flip()
+},200);
+
+setTimeout(()=>{
+	screen.clear(black)
+	screen.flip()
+	screen.blit(0,0,img_splash2)
+	screen.flip()
+},3800)
+// Load resources
+img_frame = Image.load("data/frame.png")
+img_background = Image.load("data/background.png")
+img_sprites = Image.load("data/sprites.png")
+img_menu = Image.load("data/menu.png")
+img_help = Image.load("data/help.png")
+
+snd_bumperlit = Sound.load("data/bumperlit.wav")
+snd_bumpertouch = Sound.load("data/clang.wav")
+snd_activehit = Sound.load("data/typewritershift.wav")
+snd_fixedhit = Sound.load("data/metalplate.wav")
+snd_ready = Sound.load("data/gunreload.wav")
+snd_fire = Sound.load("data/gunshot.wav")
+snd_die = Sound.load("data/exp2.wav")
+snd_extraball = Sound.load("data/cashregister.wav")
+snd_win = Sound.load("data/cheer.wav");
+snd_lose = Sound.load("data/awww.wav");
+
+font = Font.createMonoSpaced();
+font.setPixelSizes(0,10);
+
+bonusfont = Font.createMonoSpaced();
+bonusfont.setPixelSizes(0,10);
+
+
+// distances in pixels
+// time in 'ticks'
+soff = 6         // shadow offset
+mingap = 16      // minimum gap between bumpers
+gravity = 0.1    // vertical acceleration due to gravity (pixels/tick)
+friction = 0.8   // velocity loss due to friction on collision
+activeboost = 3  // added velocity on active bumper collision (pixels/tick)
+num_bumpers = 30
+num_fixed = 3    // number of fixed bumpers
+num_active = 2   // number of active bumpers
+num_green = 3    // number of guide bumpers
+num_yellow = 2   // number of bonus bumpers
+
+normalscore = 100
+redscore = 200
+freeballscore = 500
+scoremultiplier = 1
+bonusmultiplier = 50
+bonus = false
+guidecount = 0
+
+level = 1
+score = 0
+ballscore = 0    // score for this ball only; used for calculating free ball
+
+freeballat = 5000 // ball score at which a free ball is awarded 
+freeball = false
+
+hitcount = 0
+
+// data structures
+board = {minx : 25, maxx : 454, miny : 29, maxy : 262, minby : 70, maxby : 250}
+cannon = {radius:32, x:240, y:28, angle:Math.PI/2, limit:0.3, turn:0.05, slowturn:0.01, power:5}
+catcher = {width:80,height:8,x:board.minx,y:board.maxy+2,vx:2}
+trace = {count : 0, length : 25 }
+
+// animation sequences
+bumperanim = [undefined, 0,0,0,1,1,1,2,2,2,3,3,3 ]
+ballanim =   [undefined, 1,1,2,2,3,3,4,4,5,5,6,6,7,7 ]
+
+time = 0
+
+gamestate = "menu"
+
+setTimeout(()=>{
+screen.blit(0,0,l2j)
+},5500)
+// } splash
+setTimeout(()=>{
+screen.clear(black)
+screen.flip()
+raf()
+},8000)
+img_splash = undefined
+
+
+// GAME LOOP
+
+// gamestate.
+//// menu     - front screen
+//// help     - game instructions
+//// newlevel - sets up for as new level, populates the bumper table
+//// ready    - game start, player can aim the cannon && fire
+//// play     - ball in play, calculate physics & collisions each cycle
+//// done     - ball exits play, show 'death' animation if applicable
+//// remove   - remove hit bumpers from the bumper table
+//// win      - } of level, start new level
+//// }      - } of game, return to menu 
+//// exit     - exits the program
+
+snd_intro = Sound.load("data/intro.wav")
+snd_intro.play();
+snd_intro = undefined;
+
+lastcontrols = Controls.read().all
+	
+});
+function raf(){
+	controls = Controls.read()
+	
+	if(gamestate == "menu"){
+		if(controls.all != lastcontrols){
+			if(controls.cross()){
+			
+				// reset for new game
+				level = 0 // +1 at new level
+				score = 0
+				ballcount = 6 // +3 at new level
+				
+				snd_ready.play();				
+				gamestate = "newlevel"
+				eventUnpressed('cross')
+				
+			}else if(controls.triangle()){
+				gamestate = "help"
+			}
+		}
+
+	}else if(gamestate == "help"){
+		if(controls.all != lastcontrols){
+			if(controls.buttons()>0){
+				gamestate = "menu"
+			}
+		}
+	}
+	
+	
+	// cannon controls
+	if(controls.l()){
+		turnspeed = cannon.slowturn
+	}else{
+		turnspeed = cannon.turn
+	}
+	
+	if(controls.left()){
+		cannon.angle = cannon.angle + turnspeed
+		if(cannon.angle > (Math.PI-cannon.limit)){
+			cannon.angle = Math.PI-cannon.limit
+		}
+	}else if(controls.right()){
+		cannon.angle = cannon.angle - turnspeed
+		if(cannon.angle < (cannon.limit)){
+			cannon.angle = cannon.limit
+		}
+	}
+	
+	cx = Math.cos(cannon.angle)
+	cy = Math.sin(cannon.angle)
+	
+	// set barrel position
+	cannon.bx = cannon.x+(cx*cannon.radius)
+	cannon.by = cannon.y+(cy*cannon.radius)
+
+	if(gamestate == "newlevel"){
+		level = level + 1
+		guidecount = 0
+		// add 4 balls at start of new level
+		ballcount = ballcount + 4
+		bumpers = [undefined]
+		
+		num_red = 9 + level;
+		if(num_red > num_bumpers-num_green-num_yellow){
+			num_red = num_bumpers-num_green-num_yellow;
+		}
+		
+		// random level setup
+		addRandomBumpers("fixed",num_fixed)
+		addRandomBumpers("active",num_active)
+		addRandomBumpers(0,num_red)
+		addRandomBumpers(1,num_bumpers-num_red-num_green-num_yellow)
+		addRandomBumpers(2,num_green)
+		addRandomBumpers(3,num_yellow)
+		
+		// set initial ball position
+		setBall(cannon.bx, cannon.by,                    
+		cx*cannon.power,cy*cannon.power,0)
+
+		gamestate = "ready"
+		
+	}else if(gamestate == "ready"){
+		ballscore = 0;
+		bonus = false;
+		freeball = false;
+		
+		// display low ball warning
+		if(typeof ballwarning=='undefined' && ballcount < 3){
+			ballwarning = 60
+		}
+		
+		if( (bumpers.length - num_fixed - num_active) < (num_bumpers*0.25)){
+			scoremultiplier = 10
+		}else if( (bumpers.length - num_fixed - num_active) < (num_bumpers*0.5)){
+			scoremultiplier = 5
+		}else if( (bumpers.length - num_fixed - num_active) < (num_bumpers*0.75)){
+			scoremultiplier = 2
+		}else{
+			scoremultiplier = 1
+		}
+		
+		// remove warning on any button press
+		if(controls.all != lastcontrols && controls.buttons() > 0){
+			ballwarning = 0
+		}
+		
+		if(controls.all != lastcontrols && controls.cross()){
+			// reset ball warning
+			ballwarning = undefined
+			
+			// set ball's time of origin
+			ball.time = time
+			// play fire sound
+			snd_fire.play()
+			gamestate = "play"
+		}else{
+			// set ball start position
+			setBall(cannon.bx, cannon.by,                    
+			cx*cannon.power,cy*cannon.power,0)
+			
+			// calculate trace
+			trace.count = 0
+			if(guidecount > 0 && controls.r()){
+				usedguide = true
+				for(var i=1; i<trace.length; i++){
+					if(processBall(i,false)){
+						resetBall(i)
+					}
+					point = {x:ball.x, y:ball.y}
+					trace[i] = point
+					trace.count = trace.count + 1
+					if(ball.y > board.maxy-ball.radius){
+						break
+					}
+				}
+			}
+		}
+		
+		// reset ball position to cannon angle
+		setBall(cannon.bx, cannon.by,
+			cx*cannon.power,cy*cannon.power)
+			
+	}else if(gamestate == "play"){
+		reset = false // resets ball state on collision
+	
+		// process ball physics && check for collisions
+		if(processBall(time)){
+			resetBall(time)
+		}
+	
+		if(ball.y > board.maxy-ball.radius){
+			if( (ball.x > catcher.x+ball.radius) && (ball.x < catcher.x+catcher.width-ball.radius)){
+
+			    // bonus points if ball returned after hitting some bumpers
+				if(ballscore > 0){
+					score = score + freeballscore
+				}
+			
+				ball.visible = false
+				ballcount = ballcount + 1
+				snd_extraball.play()
+				freeball = true
+			}else{
+				dead = true
+				snd_die.play()
+			}
+			animframe = 1
+			gamestate = "done"
+		}
+	
+		
+	}else if(gamestate == "done"){
+		// animate ball death if appropriate
+		animframe = animframe + 1
+		if(animframe>14){
+			ball.visible = false
+			// set up for bumper removal
+			animframe = 1
+			gamestate = "remove"
+		}
+	
+		
+	}else if(gamestate == "remove"){
+		// increment animation
+		animframe = animframe + 1
+		if(animframe>12){
+			animframe=1
+			
+			// remove hit bumpers from table
+			redcount = 0;
+			new_bumpers = [undefined]
+			for(var key in bumpers){var bumper=bumpers[key];
+				if(typeof bumper !='undefined'){
+					if(bumper.hit == 0){
+						if(bumper.type == 0){
+							redcount = redcount + 1
+						}
+						table.insert(new_bumpers,bumper)
+					}
+				}
+			}
+			bumpers = new_bumpers
+			
+			// reset hit counter
+			hitcount = 0
+			
+			if(typeof usedguide!="undefined" && usedguide){
+				guidecount = guidecount - 1
+				usedguide = false
+			}
+			
+			trace.count = 0
+			
+			if(redcount == 0){
+				snd_win.play();
+				gamestate = "win"
+			}else{
+				gamestate = "ready"
+			}
+			
+			if(ballcount > 0){
+				ballcount = ballcount -1
+				snd_ready.play()
+			}else if(gamestate=="ready"){
+				// !finished, game over
+				snd_lose.play();
+				gamestate = "end"
+			}
+
+			
+		}
+	
+	}else if(gamestate == "win"){
+		if(controls.all != lastcontrols){
+			if(controls.buttons()>0){
+				gamestate = "newlevel"
+				eventUnpressed('cross')
+			}
+		}
+	
+	}else if(gamestate == "end"){
+		if(controls.all != lastcontrols){
+			if(controls.buttons()>0){
+				gamestate = "menu"
+			}
+		}
+	}
+	
+	if(gamestate == "play"){
+		time = time + 1
+	}
+	
+	// move the catcher in all gamestates
+	catcher.x = catcher.x + catcher.vx
+	if(catcher.x >= (board.maxx-catcher.width) || catcher.x <= board.minx){
+		catcher.vx = -catcher.vx
+	}
+
+	
+	// DRAW GRAPHICS
+	
+	if(gamestate == "help"){
+		// help screen
+		screen.blit(0,0,img_help)
+	}else{
+		// frame
+		screen.blit(0,0,img_frame)
+		// cannon barrel
+		screen.blit(cannon.bx-8,cannon.by-8,img_sprites,112,48,16,16)
+		// background (hides rest of barrel)
+		screen.blit(25,29,img_background)
+	
+		if(gamestate == "menu"){
+			// menu overlay
+			screen.blit(112,64,img_menu,0,0,256,192)
+		}else{
+			
+			// score
+			scoretext = score.toString();// string.format("%10d",tostring(score));
+			screen.fontPrint(font,380,18,scoretext,white);
+			
+			if(freeball){
+				screen.blit(-4,-2,img_sprites,0,96,32,32);
+			}
+
+			// ball score
+			screen.fillRect(8,34,8,(230-(230*ballscore/freeballat)),darkgreen);
+			
+			// score multiplier
+			screen.fillRect(464,34,8,(230*(bumpers-num_fixed-num_active)/num_bumpers).length,darkblue);
+			
+			if(bonus){
+				if(scoremultiplier == 2){
+					screen.blit(452,-2,img_sprites,32,128,32,32);
+				}else if(scoremultiplier == 5){
+					screen.blit(452,-2,img_sprites,64,128,32,32);
+				}else if(scoremultiplier == 10){
+					screen.blit(452,-2,img_sprites,96,128,32,32);
+				}else{
+					screen.blit(452,-2,img_sprites,0,128,32,32);
+				}
+			}else{
+				if(scoremultiplier == 2){
+					screen.blit(452,-2,img_sprites,32,96,32,32);
+				}else if(scoremultiplier == 5){
+					screen.blit(452,-2,img_sprites,64,96,32,32);
+				}else if(scoremultiplier == 10){
+					screen.blit(452,-2,img_sprites,96,96,32,32);
+				}
+			}
+			
+			if(gamestate=="ready" && guidecount > 0){
+				if(typeof usedguide!= 'undefined' && usedguide){
+					screen.fontPrint(font,275,18,"Guides."+guidecount,yellow);
+				}else{
+					screen.fontPrint(font,275,18,"Guides."+guidecount+" (hold R)",green);
+				}
+			}else{
+				screen.fontPrint(font,275,18,"Level "+level,white)
+			}
+			
+			// ball track
+			drawballs = ballcount-1
+			if(drawballs > 13){ drawballs = 13 }
+			for(var i=0; i<drawballs; i++){
+					screen.blit(196-(i*12),8,img_sprites,0,0,12,12)
+			}
+			
+			// ball catcher
+			screen.blit(catcher.x,catcher.y,img_sprites,0,24,80,8)
+			
+			// ball
+			if(ball.visible){
+				if(gamestate == "ready" || gamestate == "play") {
+					// shadow
+					screen.blit(ball.x-6+soff,ball.y-6+soff,img_sprites,0,12,12,12)
+					// sprite
+					screen.blit(ball.x-6,ball.y-6,img_sprites,0,0,12,12)
+				}
+				if(gamestate == "done"){
+					// sprite
+					screen.blit(ball.x-6,ball.y-18,img_sprites,ballanim[animframe]*12,0,12,24)
+				}
+			}
+			
+			// bumpers
+			for(var i=1; i<bumpers.length; i++){
+				// shadow
+				if(bumpers[i].type == "fixed" || bumpers[i].type == "active"){
+					screen.blit(bumpers[i].x-bumpers[i].radius+soff,bumpers[i].y-bumpers[i].radius+soff,img_sprites,96,64,32,32)
+				}else{
+					screen.blit(bumpers[i].x-bumpers[i].radius+soff,bumpers[i].y-bumpers[i].radius+soff,img_sprites,64,48,16,16)
+				}
+				// sprite
+				if(bumpers[i].type == "fixed"){
+					screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,0,64,32,32)
+				}else if(bumpers[i].type == "active"){
+					if(bumpers[i].hit>0){
+						screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,64,64,32,32)
+						// decrement animation counter
+						bumpers[i].hit = bumpers[i].hit - 1
+					}else{
+						screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,32,64,32,32)
+					}
+				}else{
+					if(gamestate=="remove"){
+						if(bumpers[i].hit == 1){
+							screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,bumperanim[animframe]*16+64,32,16,16)
+						}else{ 
+							screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,bumpers[i].type*16,32,16,16)
+						}
+					}else{ 
+						screen.blit(bumpers[i].x-bumpers[i].radius,bumpers[i].y-bumpers[i].radius,img_sprites,bumpers[i].type*16,bumpers[i].hit*16+32,16,16)
+					}
+				}
+			}
+			
+			if(gamestate=="ready"){
+				// draw trace
+				for(var i=2; i<trace.count; i++){
+					//screen.fillRect(trace[i].x,trace[i].y,2,2,green)
+					screen.drawLine(trace[i].x,trace[i].y,trace[i-1].x,trace[i-1].y,green)
+				}
+				
+				if(typeof ballwarning!='undefined' && ballwarning > 0){
+					ballwarning = ballwarning - 1
+					if(ballcount == 2){
+						screen.blit(112,64,img_menu,0,288,256,32)
+					}else if(ballcount == 1){
+						screen.blit(112,64,img_menu,0,320,256,32)
+					}else if(ballcount == 0){
+						screen.blit(112,64,img_menu,0,352,256,32)
+					}
+				}
+				
+			}else if(gamestate == "win"){
+				// "level cleared!"
+				screen.blit(112,64,img_menu,0,192,256,32)
+				screen.blit(112,220,img_menu,0,256,256,32)
+				
+			}else if(gamestate == "end"){
+				// "game over"
+				screen.blit(112,64,img_menu,0,224,256,32)
+				screen.blit(112,220,img_menu,0,256,256,32)
+				
+			}
+			
+		}
+		
+	}
+
+	//screen.waitVblankStart()
+	//screen.flip()
+	
+	lastcontrols = controls.all;	
+	if(fps){setTimeout(raf,40);}else{
+		requestAnimationFrame(()=>{raf()});
+	}
+}
+
+	
+
+	</script>
+</body>
+</html>
