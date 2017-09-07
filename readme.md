@@ -10,19 +10,18 @@ This one works without NodeJS, (in browser) and not uses abstraction (like usage
  - Every reserved keyword will be replaced even if it's inside a string or is a function name. 
 
 > What is unimplemented yet or not working?
-
+* [ ] metatables
 * [ ] native functions  
 * [ ] constants  
 * [ ] 1 line functions  
 * [ ] multiple returns  
 * [ ] prints with and without brackets  
 * [ ] tables with unusual indexes  
-* [ ] functions inside tables, created after a tables (like function a.b() )  
+* [x] <del>functions inside tables, created after a tables (like function a.b()</del> )  
 * [ ] array / object concatenation  
 * [ ] inheritance  
 * [ ] __index  
 * [ ] dofile/require/loadstring/loadfile  
-* [ ] multiple variable assignment  
+* [x] <del>multiple variable assignment</del>  
 ** **
 *[created by Remixer Dec](https://github.com/remixer-dec) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode)*
-

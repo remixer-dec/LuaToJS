@@ -58,10 +58,11 @@
 	      <option value="2">try to replace 1 to 0 in loops</option>
 	      <option value="3">do nothing</option>
       </select><br><br>
-         <sup>what to do with local variables</sup><br>
+      <sup>what to do with local variables</sup><br>
       <select id="vrfix">
 	      <option value="1">replace local with var</option>
-	      <option value="2">delete word 'local'</option>
+	      <option value="2">replace local with let</option>
+	      <option value="3">delete word 'local'</option>
       </select><br><br>
       <sup>what to do with empty tables</sup><br>
       <select id="etfix">
@@ -77,7 +78,12 @@
 	      <option value="'nil'">'nil'</option>
 	      <option value="0">0</option>
       </select><br><br>
-      <div id='xd' onclick="translateIsAReserverWordInChromeSoIHadToRenameThisFunctionWTFFirefoxForever()" class="btn btn-inline btn-large btn-success">Translate!</div></center>
+      <sup>replace all .lua extensions to .js</sup><br>
+      <select id="luafilesfix">
+	      <option value="1">yes</option>
+	      <option value="2">no</option>
+      </select><br><br>
+      <div id='xd' onclick="tr()" class="btn btn-inline btn-large btn-success">Translate!</div></center>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.27.4/codemirror.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.27.4/mode/javascript/javascript.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.27.4/mode/lua/lua.min.js"></script>
