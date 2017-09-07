@@ -26,23 +26,16 @@ function tr(){
 	l = l.replace(/ or /img,' || ');
 	l = l.replace(/ and /img,' && ');
 	l = l.replace(/(\s)?not /img,'$1!');
-<<<<<<< HEAD
 	l = l.replace(/\^/img,'**');
-=======
 	l = l.replace(/self/img,'this');
 	l = l.replace(/local function/img,'function');// ¯\_(ツ)_/¯
->>>>>>> origin/master
 	l = l.replace(/~=/img,'!=');
 	l = l.replace(/([^\.])\.\.([^\.])/img,'$1+$2');
 	l = l.replace(/\.\.\./img,'...arg');
 	l = l.replace(/(function[^\)]+\))/img,'$1{');
-<<<<<<< HEAD
-	l = l.replace(/(\n|\s)end( |,)?/img,'$1}$2');
-	l = l.replace(/math\.pi/img,'Math.PI');
-=======
 	l = l.replace(/function ([a-z_\[\]]+\.[a-z_\[\].]+)/img,'$1 = function');
 	l = l.replace(/(\n|\s)end/img,'$1}');
->>>>>>> origin/master
+	l = l.replace(/math\.pi/img,'Math.PI');
 	l = l.replace(/math\./img,'Math.');
 	l = l.replace(/\#([a-z0-9_\[\]\(\).+*\/\-]+)/img,'$1.length');
 	l = l.replace(/nil/img,nilfix.value);
