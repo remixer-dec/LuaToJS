@@ -34,13 +34,13 @@
 		-moz-user-select:none;
 	}
 	#xcontrols button {
-		background: #444;
-		border: 2px solid #444;
+		background: rgba(0,0,0,.24);
+		border: 2px solid #ccc;
 		border-radius: 2px;
 		color: white;
 		padding: 2px 10px;
 	}
-	#xcontrols,#chelp {
+	#chelp {
 		display: none;
 		position: fixed;
 		left: 0;
@@ -53,6 +53,14 @@
 		background: rgba(0,0,0,.52);
 		transform:scale(1.5);
 	}
+	#xcontrols table{
+		float:left;
+		transform: scale(1.7) translate(36px,90px);
+	}
+	#xcontrols .right{
+		float:right;
+		transform: scale(1.7) translate(-36px,90px);
+	}
 	#chelp{
 		display: block;
 		bottom: 0;
@@ -63,6 +71,9 @@
 	}
 	#ori{
 		display: none;
+	}
+	tr:nth-child(2) td {
+		height: 32px;
 	}
 	@media (orientation: portrait){
 		#ori{
@@ -97,38 +108,58 @@
 	<canvas width="480" height="272" id="cvs" style="border:2px solid black"></canvas>
 	<button onclick="zoomIn()">+</button><button onclick="zoomOut()">-</button>
 	<button onclick="fps=1">25FPS</button><button onclick="fps=false">60FPS</button>
-	<button onclick="xcontrols.style.display='block'">TOUCH CONTROLS</button><button onclick="trace.length=500">CHEAT</button><button onclick="document.body.style = 'background:url(http://i33.tinypic.com/2qmzuhd.png) 50%50% no-repeat;background-size:860px;'">CHANGE SKIN</button>
+	<button onclick="xcontrols.style.display='block';chelp.style.display='none'">TOUCH CONTROLS</button><button onclick="trace.length=500">CHEAT</button><button onclick="document.body.style = 'background:url(http://i33.tinypic.com/2qmzuhd.png) 50%50% no-repeat;background-size:860px;'">CHANGE SKIN</button>
 </div>
 <div id='xcontrols'>
 		<table>
 			<tr>
 				<td><button onclick="CTRLS.l?eventUnpressed('l'):eventPressed('l')"> L </button></td>
-				<td></td><td></td><td></td><td></td><td></td><td><button onclick="CTRLS.r?eventUnpressed('r'):eventPressed('r')"> R </button></td>
+				<td></td>
+				<td></td>
 			</tr>
-			<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
 			<tr>
 				<td></td>
 				<td><button ontouchstart="eventPressed('up')" ontouchend="eventUnpressed('up')"> ^ </button></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td><button ontouchstart="eventPressed('triangle')" ontouchend="eventUnpressed('triangle')"> /\ </button></td>
 				<td></td>
 			</tr>
 			<tr>
 				<td><button ontouchstart="eventPressed('left')" ontouchend="eventUnpressed('left')"> &lt; </button></td>
 				<td></td>
-				<td><button ontouchstart="eventPressed('right')" ontouchend="eventUnpressed('right')"> > </button></td>
-				<td></td>
-				<td><button ontouchstart="eventPressed('square')" ontouchend="eventUnpressed('square')">[]</button></td>
-				<td></td>
-				<td><button ontouchstart="eventPressed('circle')" ontouchend="eventUnpressed('circle')"> O </button></td>
+				<td><button ontouchstart="eventPressed('right')" ontouchend="eventUnpressed('right')"> > </button></td>				
 			</tr>
 			<tr>
 				<td></td>
 				<td><button ontouchstart="eventPressed('down')" ontouchend="eventUnpressed('down')"> V </button></td>
 				<td></td>
+			</tr>
+		</table>
+		<table class="right">
+			<tr>
 				<td></td>
+				<td></td>
+				<td><button onclick="CTRLS.r?eventUnpressed('r'):eventPressed('r')"> R </button></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button ontouchstart="eventPressed('triangle')" ontouchend="eventUnpressed('triangle')"> /\ </button></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><button ontouchstart="eventPressed('square')" ontouchend="eventUnpressed('square')">[]</button></td>
+				<td></td>
+				<td><button ontouchstart="eventPressed('circle')" ontouchend="eventUnpressed('circle')"> O </button></td>
+			</tr>
+			<tr>
 				<td></td>
 				<td><button ontouchstart="eventPressed('cross')" ontouchend="eventUnpressed('cross')"> X </button></td>
 				<td></td>
